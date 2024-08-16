@@ -65,12 +65,12 @@ public class GameSessionService {
         }
 
         KeyboardRow firstRow = new KeyboardRow();
-        firstRow.add(new KeyboardButton("\uD83C\uDDE6 " + item.getOption1()));
-        firstRow.add(new KeyboardButton("\uD83C\uDDE7 " + item.getOption2()));
+        firstRow.add(new KeyboardButton(item.getOption1()));
+        firstRow.add(new KeyboardButton(item.getOption2()));
 
         KeyboardRow secondRow = new KeyboardRow();
-        secondRow.add(new KeyboardButton("\uD83C\uDDE8 " + item.getOption3()));
-        secondRow.add(new KeyboardButton("\uD83C\uDDE9 " + item.getOption4()));
+        secondRow.add(new KeyboardButton(item.getOption3()));
+        secondRow.add(new KeyboardButton(item.getOption4()));
 
         replyKeyboardMarkup.setKeyboard(List.of(firstRow, secondRow));
 
