@@ -34,15 +34,14 @@ public class QuestionnaireService {
         return currentItem;
     }
 
-    public boolean checkAnswer(Integer questionId, String userAnswer) {
+    public String getCorrectAnswer(Integer questionId) {
         QuestionnaireItem questionnaireItem = repository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Не найден вопрос с id = " + questionId));
-        String answer = questionnaireItem.getAnswer();
-        return answer.equals(userAnswer);
+        return questionnaireItem.getAnswer();
     }
 
     public void restart() {
-        repository.deleteAll();
+        repository.restart();
     }
 
 }
