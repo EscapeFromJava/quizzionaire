@@ -33,6 +33,10 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.telegram</groupId>
@@ -77,6 +81,17 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>4.29.1</version>
+                <configuration>
+                    <changeLogFile>src/main/resources/db/changelog-master.xml</changeLogFile>
+                    <url>jdbc:postgresql://localhost:5432/root</url>
+                    <username>root</username>
+                    <password>root</password>
                 </configuration>
             </plugin>
         </plugins>
