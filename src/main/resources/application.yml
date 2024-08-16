@@ -6,6 +6,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
 
 bot:
   name: TapJustTapBot
