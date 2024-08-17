@@ -30,6 +30,7 @@ public class QuestionService {
 
         Question currentQuestion = questions.get(RANDOM.nextInt(questions.size()));
         session.setCurrentQuestion(currentQuestion);
+        session.setLevel(session.getLevel() + 1);
         questions.remove(currentQuestion);
 
         return currentQuestion;

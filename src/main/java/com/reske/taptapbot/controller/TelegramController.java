@@ -62,6 +62,36 @@ public class TelegramController extends TelegramLongPollingBot {
                     sendMessage(new SendMessage(String.valueOf(chatId), "Ваша статистика: \n" + stat));
                     sendMenu(chatId);
                 }
+                case "/info" -> {
+                    String info = """
+                            Отвечайте на вопросы и зарабатывайте очки!
+                            Всего 15 вопросов.
+                            При правильном ответе на каждый 5-ый вопрос фиксируется несгораемая сумма очков.
+                            Таблица стоимости каждого вопроса:
+                            1 - 100
+                            2 - 200
+                            3 - 300
+                            4 - 500
+                            5 - 1000 - несгораемая сумма
+                            6 - 2000
+                            7 - 4000
+                            8 - 8000
+                            9 - 16000
+                            10 - 32000 - несгораемая сумма
+                            11 - 64000
+                            12 - 125000
+                            13 - 250000
+                            14 - 500000
+                            15 - 1000000
+                            У вас есть 3 подсказки:
+                            50/50 - исключает два неправильных ответа
+                            Помощь зала - имитация ответа аудитории
+                            Звонок другу - имитация звонка другу
+                            Удачи! \n
+                            """;
+                    sendMessage(new SendMessage(String.valueOf(chatId), info));
+                    sendMenu(chatId);
+                }
                 default -> {
                     handleAnswer(chatId, session, callbackData);
                     step(session, chatId);
@@ -79,7 +109,7 @@ public class TelegramController extends TelegramLongPollingBot {
         Question currentQuestion = questionService.getRandomQuestion(session);
 
         if (currentQuestion == null) {
-            sendMessage(new SendMessage(String.valueOf(chatId), "Вопросы закончились \uD83D\uDE2D"));
+            finishGame(session, chatId);
             sendMenu(chatId);
             return;
         }
@@ -120,6 +150,19 @@ public class TelegramController extends TelegramLongPollingBot {
         sendMessage(message);
     }
 
+    private void finishGame(Session session, Long chatId) {
+        profileService.addScore(session);
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        String message = "Игра закончилась! \n" +
+                         "Вы заработали " + session.getScore() + " очков \n" +
+                         "Правильных ответов - " + session.getLevel();
+        sendMessage(new SendMessage(String.valueOf(chatId), message));
+
+        sessionService.clear(session);
+    }
+
     private void handleAnswer(Long chatId, Session session, String answer) {
         Question currentQuestion = session.getCurrentQuestion();
         var option = switch (answer) {
@@ -132,6 +175,7 @@ public class TelegramController extends TelegramLongPollingBot {
         if (option.equals(currentQuestion.getAnswer())) {
             sendMessage(new SendMessage(String.valueOf(chatId), "Правильно \uD83D\uDD25"));
             profileService.incrementCorrectAnswers(session.getProfile());
+            sessionService.addScore(session);
         } else {
             sendMessage(new SendMessage(String.valueOf(chatId), "Неверный ответ \uD83D\uDC4E. Правильный - " + currentQuestion.getAnswer()));
         }
@@ -147,9 +191,14 @@ public class TelegramController extends TelegramLongPollingBot {
         stat.setText("Статистика");
         stat.setCallbackData("/stat");
 
+        InlineKeyboardButton info = new InlineKeyboardButton();
+        info.setText("Информация");
+        info.setCallbackData("/info");
+
         List<InlineKeyboardButton> row = new ArrayList<>();
         row.add(play);
         row.add(stat);
+        row.add(info);
 
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         rows.add(row);

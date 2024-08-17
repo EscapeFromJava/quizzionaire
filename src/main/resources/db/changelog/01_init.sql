@@ -2,6 +2,7 @@ CREATE TABLE profile
 (
     id                    BIGINT PRIMARY KEY,
     user_name             VARCHAR(255),
+    score                 INTEGER,
     correct_answers_count INTEGER
 );
 

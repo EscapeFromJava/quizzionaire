@@ -25,6 +25,7 @@ public class Profile {
     @Column(name = "user_name")
     private String userName;
     private Integer correctAnswersCount = 0;
+    private Integer score = 0;
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> passedQuestions = new ArrayList<>();
 

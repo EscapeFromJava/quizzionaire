@@ -20,8 +20,16 @@ public class ProfileService {
 
     public String getStat(Profile profile) {
         return "Пользователь: " + profile.getUserName() + "\n" +
+               "Очки: " + profile.getScore() + "\n" +
                "Правильных ответов: " + profile.getCorrectAnswersCount() + "\n" +
                "Пройдено вопросов: " + profile.getPassedQuestions().size();
+    }
+
+    public void addScore(Session session) {
+        Integer score = session.getScore();
+        Profile profile = session.getProfile();
+        profile.setScore(profile.getScore() + score);
+        repository.save(profile);
     }
 
     public void incrementCorrectAnswers(Profile profile) {

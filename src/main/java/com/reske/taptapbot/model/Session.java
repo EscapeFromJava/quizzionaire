@@ -10,10 +10,14 @@ import java.util.List;
 public class Session {
     private Profile profile;
     private Question currentQuestion;
+    private Integer level;
+    private Integer score;
     private List<Question> questions;
 
     public Session(Profile profile) {
         this.profile = profile;
+        this.level = 0;
+        this.score = 0;
     }
 
 }
