@@ -1,16 +1,20 @@
-package com.reske.taptapbot.model;
+package com.reske.taptapbot.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Table(name = "questionnaire_item")
+@Table(name = "question")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionnaireItem {
+public class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +25,5 @@ public class QuestionnaireItem {
     private String option2;
     private String option3;
     private String option4;
-    private boolean used;
-    private boolean last;
 
 }

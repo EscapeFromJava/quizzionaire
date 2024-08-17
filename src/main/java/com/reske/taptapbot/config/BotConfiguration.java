@@ -1,6 +1,6 @@
 package com.reske.taptapbot.config;
 
-import com.reske.taptapbot.service.TelegramBot;
+import com.reske.taptapbot.controller.TelegramController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -11,9 +11,9 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class BotConfiguration {
 
     @Bean
-    public TelegramBotsApi telegramBotsApi(TelegramBot telegramBot) throws TelegramApiException {
+    public TelegramBotsApi telegramBotsApi(TelegramController telegramController) throws TelegramApiException {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-        telegramBotsApi.registerBot(telegramBot);
+        telegramBotsApi.registerBot(telegramController);
         return telegramBotsApi;
     }
 
