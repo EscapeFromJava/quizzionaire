@@ -132,8 +132,8 @@ public class TelegramController extends TelegramLongPollingBot {
         row1.add(option2);
 
         List<InlineKeyboardButton> row2 = new ArrayList<>();
-        row1.add(option3);
-        row1.add(option4);
+        row2.add(option3);
+        row2.add(option4);
 
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         rows.add(row1);
