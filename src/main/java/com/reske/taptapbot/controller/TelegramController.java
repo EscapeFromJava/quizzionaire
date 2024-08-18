@@ -1,6 +1,7 @@
 package com.reske.taptapbot.controller;
 
 import com.reske.taptapbot.config.BotProperties;
+import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.entity.Profile;
 import com.reske.taptapbot.entity.Question;
 import com.reske.taptapbot.model.Session;
@@ -34,6 +35,7 @@ public class TelegramController extends TelegramLongPollingBot {
     private final SessionService sessionService;
     private final ProfileService profileService;
     private final HelpService helpService;
+    private final GameConfig gameConfig;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -67,33 +69,7 @@ public class TelegramController extends TelegramLongPollingBot {
                     sendMenu(chatId);
                 }
                 case "/info" -> {
-                    String info = """
-                            Отвечайте на вопросы и зарабатывайте очки!
-                            Всего 15 вопросов.
-                            При правильном ответе на каждый 5-ый вопрос фиксируется несгораемая сумма очков.
-                            Таблица стоимости каждого вопроса:
-                            1 - 100
-                            2 - 200
-                            3 - 300
-                            4 - 500
-                            5 - 1000 - несгораемая сумма
-                            6 - 2000
-                            7 - 4000
-                            8 - 8000
-                            9 - 16000
-                            10 - 32000 - несгораемая сумма
-                            11 - 64000
-                            12 - 125000
-                            13 - 250000
-                            14 - 500000
-                            15 - 1000000
-                            У вас есть 3 подсказки:
-                            50/50 - исключает два неправильных ответа
-                            Помощь зала - имитация ответа аудитории
-                            Звонок другу - имитация звонка другу
-                            Удачи! \n
-                            """;
-                    sendMessage(new SendMessage(String.valueOf(chatId), info));
+                    sendMessage(new SendMessage(String.valueOf(chatId), gameConfig.getInfo()));
                     sendMenu(chatId);
                 }
                 case "/option1",
