@@ -21,6 +21,10 @@ public class SessionService {
         return SESSIONS.get(id);
     }
 
+    public Map<Long, Session> getSessions() {
+        return SESSIONS;
+    }
+
     public void addProfile(Session session) {
         SESSIONS.put(session.getProfile().getId(), session);
     }
