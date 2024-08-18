@@ -3,7 +3,6 @@ package com.reske.taptapbot.service;
 import com.reske.taptapbot.entity.Question;
 import com.reske.taptapbot.model.Helper;
 import com.reske.taptapbot.model.Session;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -15,18 +14,23 @@ import java.util.Random;
 import java.util.Stack;
 
 @Component
-@RequiredArgsConstructor
 public class HelpService {
 
     private final static Random RANDOM = new Random();
     private final static List<Helper> GARANT_HELPERS = List.of(
-            new Helper("Друзь", "Привет! Я совершенно уверен, что правильный ответ - ")
+            new Helper("Александр Друзь", "Привет! Я совершенно уверен, что правильный ответ - "),
+            new Helper("Максим Поташев", "Добрый вечер! Абсолютно точно будет сказать, что правильный ответ - "),
+            new Helper("Борис Бурда", "О, здравствуй! Уверенно заявляю, что правильный ответ - ")
     );
     private final static List<Helper> POSSIBLE_HELPERS = List.of(
-            new Helper("Дядя Ваня", "Здарова! Не знаю, возможно это - ")
+            new Helper("Дядя Ваня", "Здарова! Не знаю, возможно это - "),
+            new Helper("Тетя Маша", "Здравствуй, здравствуй! Мне кажется что это - "),
+            new Helper("Одноклассник Боря", "Салам, старина! У тебя же в школе лучше было? Ну попробуй ответить - ")
     );
     private final static List<Helper> NOT_HELPERS = List.of(
-            new Helper("Чайник", "Ало! Че? Ты куда звонишь???")
+            new Helper("Чайник", "Ало! Че? Ты куда звонишь???"),
+            new Helper("8 800 555 35 35", "Лучше позвонить, чем у кого-то занимать!"),
+            new Helper("ООО МТС", "Уважаемый абонент! У вас заканчивается срок действия договора...")
     );
 
     public void handleHelp1(Session session) {
