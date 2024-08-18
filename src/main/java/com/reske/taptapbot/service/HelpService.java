@@ -80,7 +80,7 @@ public class HelpService {
 
         String result;
 
-        if (session.isHelp1Used()) {
+        if (isUsedHelp1OnThisLevel(session)) {
             val2 = 100 - val1;
 
             collections.add(val1);
@@ -170,6 +170,14 @@ public class HelpService {
         session.setHelp3Used(true);
 
         return result;
+    }
+
+    private boolean isUsedHelp1OnThisLevel(Session session) {
+        Question currentQuestion = session.getCurrentQuestion();
+        return currentQuestion.getOption1() == null
+               || currentQuestion.getOption2() == null
+               || currentQuestion.getOption3() == null
+               || currentQuestion.getOption4() == null;
     }
 
     private String generateHelperAnswer(Helper helper, String... answers) {
