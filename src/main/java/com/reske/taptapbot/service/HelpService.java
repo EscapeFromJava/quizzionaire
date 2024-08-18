@@ -6,10 +6,12 @@ import com.reske.taptapbot.model.Session;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Stack;
 
@@ -108,10 +110,10 @@ public class HelpService {
             for (Integer possibleOption : possibleOptions) {
                 Integer temp = stack.pop();
                 switch (possibleOption) {
-                    case 1 -> sb.append("A: " + temp);
-                    case 2 -> sb.append("B: " + temp);
-                    case 3 -> sb.append("C: " + temp);
-                    case 4 -> sb.append("D: " + temp);
+                    case 1 -> sb.append("A: " + temp + "\n");
+                    case 2 -> sb.append("B: " + temp + "\n");
+                    case 3 -> sb.append("C: " + temp + "\n");
+                    case 4 -> sb.append("D: " + temp + "\n");
                 }
             }
 
@@ -170,7 +172,10 @@ public class HelpService {
         if (answers.length == 1) {
             return helper.getName() + ": " + helper.getPhrase() + answers[0];
         } else if (answers.length == 4) {
-            String answer = answers[RANDOM.nextInt(answers.length)];
+            List<String> processedAnswers = Arrays.stream(answers)
+                    .filter(Objects::nonNull)
+                    .toList();
+            String answer = processedAnswers.get(RANDOM.nextInt(processedAnswers.size()));
             return helper.getName() + ": " + helper.getPhrase() + answer;
         } else {
             return helper.getName() + ": " + helper.getPhrase();

@@ -24,7 +24,7 @@ public class ProfileService {
                "Пройдено вопросов: " + profile.getPassedQuestions();
     }
 
-    public void addScore(Session session) {
+    public Integer addAndGetTotalScore(Session session) {
         Integer level = session.getLevel();
 
         Integer score;
@@ -42,6 +42,8 @@ public class ProfileService {
         profile.setScore(profile.getScore() + score);
 
         repository.save(profile);
+
+        return score;
     }
 
     public void incrementPassedQuestion(Profile profile) {

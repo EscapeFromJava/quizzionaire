@@ -6,7 +6,6 @@ import com.reske.taptapbot.entity.Question;
 import com.reske.taptapbot.model.Session;
 import com.reske.taptapbot.service.HelpService;
 import com.reske.taptapbot.service.ProfileService;
-import com.reske.taptapbot.service.QuestionService;
 import com.reske.taptapbot.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -34,7 +33,6 @@ public class TelegramController extends TelegramLongPollingBot {
     private final BotProperties botProperties;
     private final SessionService sessionService;
     private final ProfileService profileService;
-    private final QuestionService questionService;
     private final HelpService helpService;
 
     @Override
@@ -213,7 +211,7 @@ public class TelegramController extends TelegramLongPollingBot {
     }
 
     private void finishGame(Session session, Long chatId) {
-        profileService.addScore(session);
+        Integer score = profileService.addAndGetTotalScore(session);
 
         int correctAnswerCount;
         if (session.getQuestions().isEmpty()) {
@@ -225,7 +223,7 @@ public class TelegramController extends TelegramLongPollingBot {
         profileService.addCorrectAnswers(session.getProfile(), correctAnswerCount);
 
         String message = "Игра закончилась! \n" +
-                         "Вы заработали " + session.getScore() + " очков \n" +
+                         "Вы заработали " + score + " очков \n" +
                          "Правильных ответов - " + correctAnswerCount;
 
         SendMessage sendMessage = new SendMessage();
