@@ -16,11 +16,15 @@ import lombok.NoArgsConstructor;
 public class Profile {
 
     @Id
+    @Column(name = "id")
     private Long id;
     @Column(name = "user_name")
     private String userName;
+    @Column(name = "score")
     private Integer score = 0;
+    @Column(name = "correct_answers_count")
     private Integer correctAnswersCount = 0;
+    @Column(name = "passed_questions")
     private Integer passedQuestions = 0;
 
     public Profile(Long id, String userName) {

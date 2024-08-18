@@ -4,7 +4,7 @@ CREATE TABLE profile
     user_name             VARCHAR(255),
     score                 INTEGER,
     correct_answers_count INTEGER,
-    passedQuestions       INTEGER
+    passed_questions      INTEGER
 );
 
 CREATE TABLE question
