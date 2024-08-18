@@ -110,11 +110,13 @@ public class HelpService {
             for (Integer possibleOption : possibleOptions) {
                 Integer temp = stack.pop();
                 switch (possibleOption) {
-                    case 1 -> sb.append("A: " + temp + "\n");
-                    case 2 -> sb.append("B: " + temp + "\n");
-                    case 3 -> sb.append("C: " + temp + "\n");
-                    case 4 -> sb.append("D: " + temp + "\n");
+                    case 1 -> sb.append("A: ");
+                    case 2 -> sb.append("B: ");
+                    case 3 -> sb.append("C: ");
+                    case 4 -> sb.append("D: ");
                 }
+                sb.append(temp);
+                sb.append("\n");
             }
 
             result = sb.toString();

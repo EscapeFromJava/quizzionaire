@@ -44,7 +44,8 @@ public class MessageService {
     public SendMessage getRightAnswerInfo(Long chatId, Session session) {
         StringBuilder sb = new StringBuilder();
         sb.append("Правильно \uD83D\uDD25\n");
-        sb.append("Вы заработали " + gameConfig.getScoreTable().get(session.getLevel()) + " очков\n");
+        sb.append("Вы заработали ");
+        sb.append(gameConfig.getScoreTable().get(session.getLevel())).append(" очков\n");
         if (GameConstants.isFireproofLevel(session.getLevel())) {
             sb.append("Достигнута несгораемая сумма!\n");
         }
