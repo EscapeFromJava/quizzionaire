@@ -4,6 +4,7 @@ import com.reske.taptapbot.config.BotProperties;
 import com.reske.taptapbot.entity.Profile;
 import com.reske.taptapbot.entity.Question;
 import com.reske.taptapbot.model.Session;
+import com.reske.taptapbot.service.HelpService;
 import com.reske.taptapbot.service.ProfileService;
 import com.reske.taptapbot.service.QuestionService;
 import com.reske.taptapbot.service.SessionService;
@@ -32,6 +33,7 @@ public class TelegramController extends TelegramLongPollingBot {
     private final SessionService sessionService;
     private final ProfileService profileService;
     private final QuestionService questionService;
+    private final HelpService helpService;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -237,112 +239,14 @@ public class TelegramController extends TelegramLongPollingBot {
 
     private void handleHelp(Long chatId, Session session, String callbackData) {
         switch (callbackData) {
-            case "/help1" -> {
-                Question currentQuestion = session.getCurrentQuestion();
-                String answer = currentQuestion.getAnswer();
-
-                Map<String, Integer> currentQuestionsMap = new HashMap<>();
-                currentQuestionsMap.put(currentQuestion.getOption1(), 1);
-                currentQuestionsMap.put(currentQuestion.getOption2(), 2);
-                currentQuestionsMap.put(currentQuestion.getOption3(), 3);
-                currentQuestionsMap.put(currentQuestion.getOption4(), 4);
-
-                Integer correctId = currentQuestionsMap.get(answer);
-
-                currentQuestionsMap.remove(answer);
-
-                List<Integer> possibleOptions = currentQuestionsMap.values().stream().toList();
-                Integer incorrectId = possibleOptions.get(RANDOM.nextInt(possibleOptions.size()));
-
-                List<Integer> nullOptions = new ArrayList<>();
-                for (int i = 1; i < 5; i++) {
-                    if (i != correctId && i != incorrectId) {
-                        nullOptions.add(i);
-                    }
-                }
-
-                for (Integer nullOption : nullOptions) {
-                    switch (nullOption) {
-                        case 1 -> currentQuestion.setOption1(null);
-                        case 2 -> currentQuestion.setOption2(null);
-                        case 3 -> currentQuestion.setOption3(null);
-                        case 4 -> currentQuestion.setOption4(null);
-                    }
-                }
-
-                session.setHelp1Used(true);
-            }
+            case "/help1" -> helpService.handleHelp1(session);
             case "/help2" -> {
-                int val1 = RANDOM.nextInt(101);
-                int val2;
-
-                List<Integer> collections = new ArrayList<>();
-
-                String result;
-
-                if (session.isHelp1Used()) {
-                    val2 = 100 - val1;
-
-                    collections.add(val1);
-                    collections.add(val2);
-
-                    Collections.shuffle(collections);
-
-                    Stack<Integer> stack = new Stack<>();
-                    stack.addAll(collections);
-
-                    Question currentQuestion = session.getCurrentQuestion();
-
-                    List<Integer> possibleOptions = new ArrayList<>();
-                    if (currentQuestion.getOption1() != null) {
-                        possibleOptions.add(1);
-                    }
-                    if (currentQuestion.getOption2() != null) {
-                        possibleOptions.add(2);
-                    }
-                    if (currentQuestion.getOption3() != null) {
-                        possibleOptions.add(3);
-                    }
-                    if (currentQuestion.getOption4() != null) {
-                        possibleOptions.add(4);
-                    }
-
-                    StringBuilder sb = new StringBuilder("Результат голосования: \n");
-                    for (Integer possibleOption : possibleOptions) {
-                        Integer temp = stack.pop();
-                        switch (possibleOption) {
-                            case 1 -> sb.append("A: " + temp);
-                            case 2 -> sb.append("B: " + temp);
-                            case 3 -> sb.append("C: " + temp);
-                            case 4 -> sb.append("D: " + temp);
-                        }
-                    }
-
-                    result = sb.toString();
-                } else {
-                    val2 = RANDOM.nextInt(101 - val1);
-                    int val3 = RANDOM.nextInt(101 - val1 - val2);
-                    int val4 = 100 - val1 - val2 - val3;
-
-                    collections.add(val1);
-                    collections.add(val2);
-                    collections.add(val3);
-                    collections.add(val4);
-
-                    Collections.shuffle(collections);
-
-                    result = "Результат голосования: \n" +
-                            "А: " + collections.get(0) + "\n" +
-                            "B: " + collections.get(1) + "\n" +
-                            "C: " + collections.get(2) + "\n" +
-                            "D: " + collections.get(3) + "\n";
-                }
+                String result = helpService.handleHelp2(session);
                 sendMessage(new SendMessage(String.valueOf(chatId), result));
-
-                session.setHelp2Used(true);
             }
             case "/help3" -> {
-                //звонок другу
+                String result = helpService.handleHelp3(session);
+                sendMessage(new SendMessage(String.valueOf(chatId), result));
             }
             default -> throw new UnsupportedOperationException("Неизвестная команда - " + callbackData);
         }
