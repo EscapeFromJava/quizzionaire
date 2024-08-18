@@ -19,19 +19,13 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import static com.reske.taptapbot.common.GameConstants.WIN_LEVEL;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TelegramController extends TelegramLongPollingBot {
-
-    private static final Random RANDOM = new Random();
 
     private final BotProperties botProperties;
     private final SessionService sessionService;
@@ -71,8 +65,8 @@ public class TelegramController extends TelegramLongPollingBot {
 
         switch (callbackData) {
             case "/play" -> {
-                sessionService.addQuestions(session);
-                setQuestion(session, chatId);
+                sessionService.fillQuestions(session);
+                sessionService.setCurrentQuestion(session);
                 showAnswerOptions(session, chatId);
             }
             case "/stat" -> {
@@ -90,8 +84,13 @@ public class TelegramController extends TelegramLongPollingBot {
                  "/option4" -> {
                 boolean isPositiveAnswer = handleAnswer(chatId, session, callbackData);
                 if (isPositiveAnswer) {
-                    setQuestion(session, chatId);
-                    showAnswerOptions(session, chatId);
+                    if (session.getQuestions().isEmpty()) {
+                        finishGame(session, chatId);
+                        sendMenu(chatId);
+                    } else {
+                        sessionService.setCurrentQuestion(session);
+                        showAnswerOptions(session, chatId);
+                    }
                 } else {
                     finishGame(session, chatId);
                     sendMenu(chatId);
@@ -118,83 +117,12 @@ public class TelegramController extends TelegramLongPollingBot {
             return;
         }
 
-        List<InlineKeyboardButton> row1 = new ArrayList<>();
-        List<InlineKeyboardButton> row2 = new ArrayList<>();
-
-        if (currentQuestion.getOption1() != null) {
-            InlineKeyboardButton option1 = new InlineKeyboardButton();
-            option1.setText("A. " + currentQuestion.getOption1());
-            option1.setCallbackData("/option1");
-            row1.add(option1);
-        }
-        if (currentQuestion.getOption2() != null) {
-            InlineKeyboardButton option2 = new InlineKeyboardButton();
-            option2.setText("B. " + currentQuestion.getOption2());
-            option2.setCallbackData("/option2");
-            row1.add(option2);
-        }
-        if (currentQuestion.getOption3() != null) {
-            InlineKeyboardButton option3 = new InlineKeyboardButton();
-            option3.setText("C. " + currentQuestion.getOption3());
-            option3.setCallbackData("/option3");
-            row2.add(option3);
-        }
-        if (currentQuestion.getOption4() != null) {
-            InlineKeyboardButton option4 = new InlineKeyboardButton();
-            option4.setText("D. " + currentQuestion.getOption4());
-            option4.setCallbackData("/option4");
-            row2.add(option4);
-        }
-
-        List<InlineKeyboardButton> row3 = new ArrayList<>();
-        if (!session.isHelp1Used()) {
-            InlineKeyboardButton help1 = new InlineKeyboardButton();
-            help1.setText("50/50");
-            help1.setCallbackData("/help1");
-            row3.add(help1);
-        }
-        if (!session.isHelp2Used()) {
-            InlineKeyboardButton help2 = new InlineKeyboardButton();
-            help2.setText("Помощь зала");
-            help2.setCallbackData("/help2");
-            row3.add(help2);
-        }
-        if (!session.isHelp3Used()) {
-            InlineKeyboardButton help3 = new InlineKeyboardButton();
-            help3.setText("Звонок другу");
-            help3.setCallbackData("/help3");
-            row3.add(help3);
-        }
-
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        rows.add(row1);
-        rows.add(row2);
-        rows.add(row3);
-
-        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-        keyboardMarkup.setKeyboard(rows);
-
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(session.getCurrentQuestion().getQuestion());
-        message.setReplyMarkup(keyboardMarkup);
+        message.setReplyMarkup(keyboardService.answerMenu(session));
 
         sendMessage(message);
-    }
-
-    private void setQuestion(Session session, Long chatId) {
-        List<Question> questions = session.getQuestions();
-
-        if (questions.isEmpty()) {
-            finishGame(session, chatId);
-            sendMenu(chatId);
-            return;
-        }
-
-        Question currentQuestion = questions.get(RANDOM.nextInt(questions.size()));
-        session.setCurrentQuestion(currentQuestion);
-        session.setLevel(session.getLevel() + 1);
-        questions.remove(currentQuestion);
     }
 
     private void finishGame(Session session, Long chatId) {
@@ -202,7 +130,7 @@ public class TelegramController extends TelegramLongPollingBot {
 
         int correctAnswerCount;
         if (session.getQuestions().isEmpty()) {
-            correctAnswerCount = 15;
+            correctAnswerCount = WIN_LEVEL;
         } else {
             correctAnswerCount = session.getLevel() - 1;
         }

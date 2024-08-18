@@ -12,5 +12,13 @@ import java.util.Map;
 public class KeyboardConfiguration {
 
     private Map<String, String> mainMenu;
+    private Map<String, Option> optionMenu;
+    private Map<String, Option> helpMenu;
+
+    @Data
+    public static class Option {
+        private String text;
+        private String callbackData;
+    }
 
 }

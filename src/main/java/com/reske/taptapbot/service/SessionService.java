@@ -1,5 +1,6 @@
 package com.reske.taptapbot.service;
 
+import com.reske.taptapbot.common.GameConstants;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.entity.Question;
 import com.reske.taptapbot.model.Session;
@@ -31,7 +32,7 @@ public class SessionService {
         SESSIONS.put(session.getProfile().getId(), session);
     }
 
-    public void addQuestions(Session session) {
+    public void fillQuestions(Session session) {
         List<Question> questions = questionService.init(15);
         session.setQuestions(questions);
     }
@@ -51,5 +52,13 @@ public class SessionService {
         session.setHelp1Used(false);
         session.setHelp2Used(false);
         session.setHelp3Used(false);
+    }
+
+    public void setCurrentQuestion(Session session) {
+        List<Question> questions = session.getQuestions();
+        Question currentQuestion = questions.get(GameConstants.RANDOM.nextInt(questions.size()));
+        session.setCurrentQuestion(currentQuestion);
+        session.setLevel(session.getLevel() + 1);
+        questions.remove(currentQuestion);
     }
 }

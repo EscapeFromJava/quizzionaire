@@ -5,6 +5,8 @@ import com.reske.taptapbot.model.Helper;
 import com.reske.taptapbot.model.Session;
 import org.springframework.stereotype.Component;
 
+import static com.reske.taptapbot.common.GameConstants.RANDOM;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,13 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Stack;
 
 @Component
 public class HelpService {
 
-    private final static Random RANDOM = new Random();
     private final static List<Helper> GARANT_HELPERS = List.of(
             new Helper("Александр Друзь", "Привет! Я совершенно уверен, что правильный ответ - "),
             new Helper("Максим Поташев", "Добрый вечер! Абсолютно точно будет сказать, что правильный ответ - "),

@@ -3,3 +3,26 @@ keyboard:
     "[Играть]": /play
     "[Статистика]": /stat
     "[Информация]": /info
+  option-menu:
+    option1:
+      text: "A. "
+      callbackData: "/option1"
+    option2:
+      text: "B. "
+      callbackData: "/option2"
+    option3:
+      text: "C. "
+      callbackData: "/option3"
+    option4:
+      text: "D. "
+      callbackData: "/option4"
+  help-menu:
+    help1:
+      text: "50/50"
+      callbackData: "/help1"
+    help2:
+      text: "Помощь зала"
+      callbackData: "/help2"
+    help3:
+      text: "Звонок другу"
+      callbackData: "/help3"
