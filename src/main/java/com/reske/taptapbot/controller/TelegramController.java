@@ -1,5 +1,6 @@
 package com.reske.taptapbot.controller;
 
+import com.reske.taptapbot.common.GameConstants;
 import com.reske.taptapbot.config.BotProperties;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.entity.Profile;
@@ -76,13 +77,13 @@ public class TelegramController extends TelegramLongPollingBot {
                      "/option2",
                      "/option3",
                      "/option4" -> {
-                    boolean endGame = handleAnswer(chatId, session, callbackData);
-                    if (endGame) {
-                        finishGame(session, chatId);
-                        sendMenu(chatId);
-                    } else {
+                    boolean isPositiveAnswer = handleAnswer(chatId, session, callbackData);
+                    if (isPositiveAnswer) {
                         setQuestion(session, chatId);
                         showAnswerOptions(session, chatId);
+                    } else {
+                        finishGame(session, chatId);
+                        sendMenu(chatId);
                     }
                 }
                 case "/help1",
@@ -224,13 +225,44 @@ public class TelegramController extends TelegramLongPollingBot {
         profileService.incrementPassedQuestion(session.getProfile());
 
         if (option.equals(currentQuestion.getAnswer())) {
-            sendMessage(new SendMessage(String.valueOf(chatId), "Правильно \uD83D\uDD25"));
-            sessionService.addScore(session);
-            return false;
-        } else {
-            sendMessage(new SendMessage(String.valueOf(chatId), "Неверный ответ \uD83D\uDC4E. Правильный - " + currentQuestion.getAnswer()));
+            positiveResult(chatId, session);
             return true;
+        } else {
+            negativeResult(chatId, session);
+            return false;
         }
+    }
+
+    private void negativeResult(Long chatId, Session session) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Неверный ответ \uD83D\uDC4E\n");
+        sb.append("Правильный - " + session.getCurrentQuestion().getAnswer());
+
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(sb.toString());
+
+        sendMessage(message);
+    }
+
+    private void positiveResult(Long chatId, Session session) {
+        Integer currentScore = gameConfig.getScoreTable().get(session.getLevel());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Правильно \uD83D\uDD25\n");
+        sb.append("Вы заработали " + currentScore + " очков\n");
+        if (GameConstants.isFireproofLevel(session.getLevel())) {
+            sb.append("Достигнута несгораемая сумма!\n");
+        }
+        sb.append("Следующий вопрос: \n");
+
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(sb.toString());
+
+        sendMessage(message);
+
+        sessionService.addScore(session);
     }
 
     private void handleHelp(Long chatId, Session session, String callbackData) {

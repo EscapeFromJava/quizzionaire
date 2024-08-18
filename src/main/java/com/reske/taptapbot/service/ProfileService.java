@@ -1,5 +1,6 @@
 package com.reske.taptapbot.service;
 
+import com.reske.taptapbot.common.GameConstants;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.entity.Profile;
 import com.reske.taptapbot.model.Session;
@@ -12,10 +13,6 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class ProfileService {
-
-    private static final Integer FIRST_FIREPROOF_LEVEL = 5;
-    private static final Integer SECOND_FIREPROOF_LEVEL = 10;
-    private static final Integer WIN_LEVEL = 15;
 
     private final ProfileRepository repository;
     private final GameConfig gameConfig;
@@ -36,9 +33,9 @@ public class ProfileService {
         Map<Integer, Integer> scoreTable = gameConfig.getScoreTable();
 
         Integer score = switch (session.getLevel() - 1) {
-            case 5, 6, 7, 8, 9 -> scoreTable.get(FIRST_FIREPROOF_LEVEL);
-            case 10, 11, 12, 13, 14 -> scoreTable.get(SECOND_FIREPROOF_LEVEL);
-            case 15 -> scoreTable.get(WIN_LEVEL);
+            case 5, 6, 7, 8, 9 -> scoreTable.get(GameConstants.FIRST_FIREPROOF_LEVEL);
+            case 10, 11, 12, 13, 14 -> scoreTable.get(GameConstants.SECOND_FIREPROOF_LEVEL);
+            case 15 -> scoreTable.get(GameConstants.WIN_LEVEL);
             default -> 0;
         };
 
