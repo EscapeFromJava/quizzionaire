@@ -1,0 +1,5 @@
+keyboard:
+  main-menu:
+    "[Играть]": /play
+    "[Статистика]": /stat
+    "[Информация]": /info

@@ -7,6 +7,7 @@ import com.reske.taptapbot.entity.Profile;
 import com.reske.taptapbot.entity.Question;
 import com.reske.taptapbot.model.Session;
 import com.reske.taptapbot.service.HelpService;
+import com.reske.taptapbot.service.KeyboardService;
 import com.reske.taptapbot.service.ProfileService;
 import com.reske.taptapbot.service.SessionService;
 import lombok.RequiredArgsConstructor;
@@ -37,65 +38,74 @@ public class TelegramController extends TelegramLongPollingBot {
     private final ProfileService profileService;
     private final HelpService helpService;
     private final GameConfig gameConfig;
+    private final KeyboardService keyboardService;
 
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            Long chatId = update.getMessage().getChatId();
-            String userName = update.getMessage().getChat().getUserName();
-
-            Profile profile = profileService.getOrCreate(chatId, userName);
-
-            Session session = new Session(profile);
-            sessionService.addProfile(session);
-
-            sendGreeting(chatId, userName);
-            sendMenu(chatId);
+            greetingProcess(update);
         } else if (update.hasCallbackQuery()) {
-            String callbackData = update.getCallbackQuery().getData();
-            String callbackQueryId = update.getCallbackQuery().getId();
-            Long chatId = update.getCallbackQuery().getMessage().getChatId();
+            gameProcess(update);
+        }
+    }
 
-            Session session = sessionService.get(chatId);
+    private void greetingProcess(Update update) {
+        Long chatId = update.getMessage().getChatId();
+        String userName = update.getMessage().getChat().getUserName();
 
-            switch (callbackData) {
-                case "/play" -> {
-                    sessionService.addQuestions(session);
+        Profile profile = profileService.getOrCreate(chatId, userName);
+
+        Session session = new Session(profile);
+        sessionService.addProfile(session);
+
+        sendGreeting(chatId, userName);
+        sendMenu(chatId);
+    }
+
+    private void gameProcess(Update update) {
+        String callbackData = update.getCallbackQuery().getData();
+        String callbackQueryId = update.getCallbackQuery().getId();
+        Long chatId = update.getCallbackQuery().getMessage().getChatId();
+
+        Session session = sessionService.get(chatId);
+
+        switch (callbackData) {
+            case "/play" -> {
+                sessionService.addQuestions(session);
+                setQuestion(session, chatId);
+                showAnswerOptions(session, chatId);
+            }
+            case "/stat" -> {
+                String stat = profileService.getStat(session.getProfile());
+                sendMessage(new SendMessage(String.valueOf(chatId), "Ваша статистика: \n" + stat));
+                sendMenu(chatId);
+            }
+            case "/info" -> {
+                sendMessage(new SendMessage(String.valueOf(chatId), gameConfig.getInfo()));
+                sendMenu(chatId);
+            }
+            case "/option1",
+                 "/option2",
+                 "/option3",
+                 "/option4" -> {
+                boolean isPositiveAnswer = handleAnswer(chatId, session, callbackData);
+                if (isPositiveAnswer) {
                     setQuestion(session, chatId);
                     showAnswerOptions(session, chatId);
-                }
-                case "/stat" -> {
-                    String stat = profileService.getStat(session.getProfile());
-                    sendMessage(new SendMessage(String.valueOf(chatId), "Ваша статистика: \n" + stat));
+                } else {
+                    finishGame(session, chatId);
                     sendMenu(chatId);
                 }
-                case "/info" -> {
-                    sendMessage(new SendMessage(String.valueOf(chatId), gameConfig.getInfo()));
-                    sendMenu(chatId);
-                }
-                case "/option1",
-                     "/option2",
-                     "/option3",
-                     "/option4" -> {
-                    boolean isPositiveAnswer = handleAnswer(chatId, session, callbackData);
-                    if (isPositiveAnswer) {
-                        setQuestion(session, chatId);
-                        showAnswerOptions(session, chatId);
-                    } else {
-                        finishGame(session, chatId);
-                        sendMenu(chatId);
-                    }
-                }
-                case "/help1",
-                     "/help2",
-                     "/help3" -> {
-                    handleHelp(chatId, session, callbackData);
-                    showAnswerOptions(session, chatId);
-                }
-                default -> throw new UnsupportedOperationException("Неизвестная команда - " + callbackData);
             }
-            sendMessage(new AnswerCallbackQuery(callbackQueryId));
+            case "/help1",
+                 "/help2",
+                 "/help3" -> {
+                handleHelp(chatId, session, callbackData);
+                showAnswerOptions(session, chatId);
+            }
+            default -> throw new UnsupportedOperationException("Неизвестная команда - " + callbackData);
         }
+        sendMessage(new AnswerCallbackQuery(callbackQueryId));
     }
 
     private void sendGreeting(Long chatId, String userName) {
@@ -281,33 +291,10 @@ public class TelegramController extends TelegramLongPollingBot {
     }
 
     private void sendMenu(Long chatId) {
-        InlineKeyboardButton play = new InlineKeyboardButton();
-        play.setText("Играть");
-        play.setCallbackData("/play");
-
-        InlineKeyboardButton stat = new InlineKeyboardButton();
-        stat.setText("Статистика");
-        stat.setCallbackData("/stat");
-
-        InlineKeyboardButton info = new InlineKeyboardButton();
-        info.setText("Информация");
-        info.setCallbackData("/info");
-
-        List<InlineKeyboardButton> row = new ArrayList<>();
-        row.add(play);
-        row.add(stat);
-        row.add(info);
-
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        rows.add(row);
-
-        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-        keyboardMarkup.setKeyboard(rows);
-
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText("Выбери действие:");
-        sendMessage.setReplyMarkup(keyboardMarkup);
+        sendMessage.setReplyMarkup(keyboardService.mainMenu());
 
         sendMessage(sendMessage);
     }

@@ -1,7 +1,8 @@
 spring:
   profiles:
     include: >
-      game
+      game,
+      keyboard
   datasource:
     url: jdbc:postgresql://localhost:5432/root
     username: root
