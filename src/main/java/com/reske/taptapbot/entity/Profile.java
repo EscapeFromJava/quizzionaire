@@ -1,17 +1,12 @@
 package com.reske.taptapbot.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Table(name = "profile")
@@ -24,10 +19,9 @@ public class Profile {
     private Long id;
     @Column(name = "user_name")
     private String userName;
-    private Integer correctAnswersCount = 0;
     private Integer score = 0;
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Integer> passedQuestions = new ArrayList<>();
+    private Integer correctAnswersCount = 0;
+    private Integer passedQuestions = 0;
 
     public Profile(Long id, String userName) {
         this.id = id;

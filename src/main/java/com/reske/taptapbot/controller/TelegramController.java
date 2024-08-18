@@ -20,7 +20,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Component
@@ -100,9 +102,14 @@ public class TelegramController extends TelegramLongPollingBot {
                      "/option2",
                      "/option3",
                      "/option4" -> {
-                    handleAnswer(chatId, session, callbackData);
-                    setQuestion(session, chatId);
-                    showAnswerOptions(session, chatId);
+                    boolean endGame = handleAnswer(chatId, session, callbackData);
+                    if (endGame) {
+                        finishGame(session, chatId);
+                        sendMenu(chatId);
+                    } else {
+                        setQuestion(session, chatId);
+                        showAnswerOptions(session, chatId);
+                    }
                 }
                 case "/help1",
                      "/help2",
@@ -208,17 +215,29 @@ public class TelegramController extends TelegramLongPollingBot {
     private void finishGame(Session session, Long chatId) {
         profileService.addScore(session);
 
+        int correctAnswerCount;
+        if (session.getQuestions().isEmpty()) {
+            correctAnswerCount = 15;
+        } else {
+            correctAnswerCount = session.getLevel() - 1;
+        }
+
+        profileService.addCorrectAnswers(session.getProfile(), correctAnswerCount);
+
+        String message = "Игра закончилась! \n" +
+                         "Вы заработали " + session.getScore() + " очков \n" +
+                         "Правильных ответов - " + correctAnswerCount;
+
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        String message = "Игра закончилась! \n" +
-                "Вы заработали " + session.getScore() + " очков \n" +
-                "Правильных ответов - " + session.getLevel();
-        sendMessage(new SendMessage(String.valueOf(chatId), message));
+        sendMessage.setText(message);
+
+        sendMessage(sendMessage);
 
         sessionService.clear(session);
     }
 
-    private void handleAnswer(Long chatId, Session session, String answer) {
+    private boolean handleAnswer(Long chatId, Session session, String answer) {
         Question currentQuestion = session.getCurrentQuestion();
         var option = switch (answer) {
             case "/option1" -> currentQuestion.getOption1();
@@ -227,14 +246,17 @@ public class TelegramController extends TelegramLongPollingBot {
             case "/option4" -> currentQuestion.getOption4();
             default -> throw new IllegalStateException("Неизвестный ввод: " + answer);
         };
+
+        profileService.incrementPassedQuestion(session.getProfile());
+
         if (option.equals(currentQuestion.getAnswer())) {
             sendMessage(new SendMessage(String.valueOf(chatId), "Правильно \uD83D\uDD25"));
-            profileService.incrementCorrectAnswers(session.getProfile());
             sessionService.addScore(session);
+            return false;
         } else {
             sendMessage(new SendMessage(String.valueOf(chatId), "Неверный ответ \uD83D\uDC4E. Правильный - " + currentQuestion.getAnswer()));
+            return true;
         }
-        profileService.addPassedQuestion(session);
     }
 
     private void handleHelp(Long chatId, Session session, String callbackData) {

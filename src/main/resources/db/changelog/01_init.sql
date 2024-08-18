@@ -3,14 +3,8 @@ CREATE TABLE profile
     id                    BIGINT PRIMARY KEY,
     user_name             VARCHAR(255),
     score                 INTEGER,
-    correct_answers_count INTEGER
-);
-
-CREATE TABLE profile_passed_questions
-(
-    profile_id       BIGINT NOT NULL,
-    passed_questions INTEGER,
-    CONSTRAINT fk_profile_passed_questions_on_profile FOREIGN KEY (profile_id) REFERENCES profile (id)
+    correct_answers_count INTEGER,
+    passedQuestions       INTEGER
 );
 
 CREATE TABLE question
