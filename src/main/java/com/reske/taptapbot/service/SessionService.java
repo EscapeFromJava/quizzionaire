@@ -7,6 +7,8 @@ import com.reske.taptapbot.model.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import static com.reske.taptapbot.common.GameConstants.WIN_LEVEL;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +20,7 @@ public class SessionService {
     private static final Map<Long, Session> SESSIONS = new ConcurrentHashMap<>();
 
     private final QuestionService questionService;
+    private final ProfileService profileService;
     private final GameConfig gameConfig;
 
     public Session get(Long id) {
@@ -60,5 +63,21 @@ public class SessionService {
         session.setCurrentQuestion(currentQuestion);
         session.setLevel(session.getLevel() + 1);
         questions.remove(currentQuestion);
+    }
+
+    public String calculateGameResult(Session session) {
+        int correctAnswerCount;
+        if (session.getQuestions().isEmpty()) {
+            correctAnswerCount = WIN_LEVEL;
+        } else {
+            correctAnswerCount = session.getLevel() - 1;
+        }
+
+        profileService.addCorrectAnswers(session.getProfile(), correctAnswerCount);
+
+        return "Игра закончилась! \n" +
+               "Вы заработали " + profileService.addAndGetTotalScore(session) + " очков \n" +
+               "Правильных ответов - " + correctAnswerCount;
+
     }
 }
