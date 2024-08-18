@@ -58,5 +58,8 @@ public class SessionService {
         session.setScore(0);
         session.setQuestions(null);
         session.setCurrentQuestion(null);
+        session.setHelp1Used(false);
+        session.setHelp2Used(false);
+        session.setHelp3Used(false);
     }
 }
