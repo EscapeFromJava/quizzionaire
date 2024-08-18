@@ -13,6 +13,9 @@ public class Session {
     private Integer level;
     private Integer score;
     private List<Question> questions;
+    private boolean help1Used;
+    private boolean help2Used;
+    private boolean help3Used;
 
     public Session(Profile profile) {
         this.profile = profile;

@@ -19,13 +19,14 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TelegramController extends TelegramLongPollingBot {
+
+    private static final Random RANDOM = new Random();
 
     private final BotProperties botProperties;
     private final SessionService sessionService;
@@ -55,7 +56,8 @@ public class TelegramController extends TelegramLongPollingBot {
             switch (callbackData) {
                 case "/play" -> {
                     sessionService.addQuestions(session);
-                    step(session, chatId);
+                    setQuestion(session, chatId);
+                    showAnswerOptions(session, chatId);
                 }
                 case "/stat" -> {
                     String stat = profileService.getStat(session.getProfile());
@@ -92,10 +94,21 @@ public class TelegramController extends TelegramLongPollingBot {
                     sendMessage(new SendMessage(String.valueOf(chatId), info));
                     sendMenu(chatId);
                 }
-                default -> {
+                case "/option1",
+                     "/option2",
+                     "/option3",
+                     "/option4" -> {
                     handleAnswer(chatId, session, callbackData);
-                    step(session, chatId);
+                    setQuestion(session, chatId);
+                    showAnswerOptions(session, chatId);
                 }
+                case "/help1",
+                     "/help2",
+                     "/help3" -> {
+                    handleHelp(chatId, session, callbackData);
+                    showAnswerOptions(session, chatId);
+                }
+                default -> throw new UnsupportedOperationException("Неизвестная команда - " + callbackData);
             }
             sendMessage(new AnswerCallbackQuery(callbackQueryId));
         }
@@ -105,39 +118,64 @@ public class TelegramController extends TelegramLongPollingBot {
         sendMessage(new SendMessage(String.valueOf(chatId), "Привет, " + userName + "!"));
     }
 
-    private void step(Session session, Long chatId) {
-        Question currentQuestion = questionService.getRandomQuestion(session);
-
+    private void showAnswerOptions(Session session, Long chatId) {
+        Question currentQuestion = session.getCurrentQuestion();
         if (currentQuestion == null) {
-            finishGame(session, chatId);
-            sendMenu(chatId);
             return;
         }
 
-        InlineKeyboardButton option1 = new InlineKeyboardButton();
-        option1.setText(currentQuestion.getOption1());
-        option1.setCallbackData("/option1");
-        InlineKeyboardButton option2 = new InlineKeyboardButton();
-        option2.setText(currentQuestion.getOption2());
-        option2.setCallbackData("/option2");
-        InlineKeyboardButton option3 = new InlineKeyboardButton();
-        option3.setText(currentQuestion.getOption3());
-        option3.setCallbackData("/option3");
-        InlineKeyboardButton option4 = new InlineKeyboardButton();
-        option4.setText(currentQuestion.getOption4());
-        option4.setCallbackData("/option4");
-
         List<InlineKeyboardButton> row1 = new ArrayList<>();
-        row1.add(option1);
-        row1.add(option2);
-
         List<InlineKeyboardButton> row2 = new ArrayList<>();
-        row2.add(option3);
-        row2.add(option4);
+
+        if (currentQuestion.getOption1() != null) {
+            InlineKeyboardButton option1 = new InlineKeyboardButton();
+            option1.setText("A. " + currentQuestion.getOption1());
+            option1.setCallbackData("/option1");
+            row1.add(option1);
+        }
+        if (currentQuestion.getOption2() != null) {
+            InlineKeyboardButton option2 = new InlineKeyboardButton();
+            option2.setText("B. " + currentQuestion.getOption2());
+            option2.setCallbackData("/option2");
+            row1.add(option2);
+        }
+        if (currentQuestion.getOption3() != null) {
+            InlineKeyboardButton option3 = new InlineKeyboardButton();
+            option3.setText("C. " + currentQuestion.getOption3());
+            option3.setCallbackData("/option3");
+            row2.add(option3);
+        }
+        if (currentQuestion.getOption4() != null) {
+            InlineKeyboardButton option4 = new InlineKeyboardButton();
+            option4.setText("D. " + currentQuestion.getOption4());
+            option4.setCallbackData("/option4");
+            row2.add(option4);
+        }
+
+        List<InlineKeyboardButton> row3 = new ArrayList<>();
+        if (!session.isHelp1Used()) {
+            InlineKeyboardButton help1 = new InlineKeyboardButton();
+            help1.setText("50/50");
+            help1.setCallbackData("/help1");
+            row3.add(help1);
+        }
+        if (!session.isHelp2Used()) {
+            InlineKeyboardButton help2 = new InlineKeyboardButton();
+            help2.setText("Помощь зала");
+            help2.setCallbackData("/help2");
+            row3.add(help2);
+        }
+        if (!session.isHelp3Used()) {
+            InlineKeyboardButton help3 = new InlineKeyboardButton();
+            help3.setText("Звонок другу");
+            help3.setCallbackData("/help3");
+            row3.add(help3);
+        }
 
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         rows.add(row1);
         rows.add(row2);
+        rows.add(row3);
 
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
@@ -150,14 +188,29 @@ public class TelegramController extends TelegramLongPollingBot {
         sendMessage(message);
     }
 
+    private void setQuestion(Session session, Long chatId) {
+        List<Question> questions = session.getQuestions();
+
+        if (questions.isEmpty()) {
+            finishGame(session, chatId);
+            sendMenu(chatId);
+            return;
+        }
+
+        Question currentQuestion = questions.get(RANDOM.nextInt(questions.size()));
+        session.setCurrentQuestion(currentQuestion);
+        session.setLevel(session.getLevel() + 1);
+        questions.remove(currentQuestion);
+    }
+
     private void finishGame(Session session, Long chatId) {
         profileService.addScore(session);
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         String message = "Игра закончилась! \n" +
-                         "Вы заработали " + session.getScore() + " очков \n" +
-                         "Правильных ответов - " + session.getLevel();
+                "Вы заработали " + session.getScore() + " очков \n" +
+                "Правильных ответов - " + session.getLevel();
         sendMessage(new SendMessage(String.valueOf(chatId), message));
 
         sessionService.clear(session);
@@ -180,6 +233,119 @@ public class TelegramController extends TelegramLongPollingBot {
             sendMessage(new SendMessage(String.valueOf(chatId), "Неверный ответ \uD83D\uDC4E. Правильный - " + currentQuestion.getAnswer()));
         }
         profileService.addPassedQuestion(session);
+    }
+
+    private void handleHelp(Long chatId, Session session, String callbackData) {
+        switch (callbackData) {
+            case "/help1" -> {
+                Question currentQuestion = session.getCurrentQuestion();
+                String answer = currentQuestion.getAnswer();
+
+                Map<String, Integer> currentQuestionsMap = new HashMap<>();
+                currentQuestionsMap.put(currentQuestion.getOption1(), 1);
+                currentQuestionsMap.put(currentQuestion.getOption2(), 2);
+                currentQuestionsMap.put(currentQuestion.getOption3(), 3);
+                currentQuestionsMap.put(currentQuestion.getOption4(), 4);
+
+                Integer correctId = currentQuestionsMap.get(answer);
+
+                currentQuestionsMap.remove(answer);
+
+                List<Integer> possibleOptions = currentQuestionsMap.values().stream().toList();
+                Integer incorrectId = possibleOptions.get(RANDOM.nextInt(possibleOptions.size()));
+
+                List<Integer> nullOptions = new ArrayList<>();
+                for (int i = 1; i < 5; i++) {
+                    if (i != correctId && i != incorrectId) {
+                        nullOptions.add(i);
+                    }
+                }
+
+                for (Integer nullOption : nullOptions) {
+                    switch (nullOption) {
+                        case 1 -> currentQuestion.setOption1(null);
+                        case 2 -> currentQuestion.setOption2(null);
+                        case 3 -> currentQuestion.setOption3(null);
+                        case 4 -> currentQuestion.setOption4(null);
+                    }
+                }
+
+                session.setHelp1Used(true);
+            }
+            case "/help2" -> {
+                int val1 = RANDOM.nextInt(101);
+                int val2;
+
+                List<Integer> collections = new ArrayList<>();
+
+                String result;
+
+                if (session.isHelp1Used()) {
+                    val2 = 100 - val1;
+
+                    collections.add(val1);
+                    collections.add(val2);
+
+                    Collections.shuffle(collections);
+
+                    Stack<Integer> stack = new Stack<>();
+                    stack.addAll(collections);
+
+                    Question currentQuestion = session.getCurrentQuestion();
+
+                    List<Integer> possibleOptions = new ArrayList<>();
+                    if (currentQuestion.getOption1() != null) {
+                        possibleOptions.add(1);
+                    }
+                    if (currentQuestion.getOption2() != null) {
+                        possibleOptions.add(2);
+                    }
+                    if (currentQuestion.getOption3() != null) {
+                        possibleOptions.add(3);
+                    }
+                    if (currentQuestion.getOption4() != null) {
+                        possibleOptions.add(4);
+                    }
+
+                    StringBuilder sb = new StringBuilder("Результат голосования: \n");
+                    for (Integer possibleOption : possibleOptions) {
+                        Integer temp = stack.pop();
+                        switch (possibleOption) {
+                            case 1 -> sb.append("A: " + temp);
+                            case 2 -> sb.append("B: " + temp);
+                            case 3 -> sb.append("C: " + temp);
+                            case 4 -> sb.append("D: " + temp);
+                        }
+                    }
+
+                    result = sb.toString();
+                } else {
+                    val2 = RANDOM.nextInt(101 - val1);
+                    int val3 = RANDOM.nextInt(101 - val1 - val2);
+                    int val4 = 100 - val1 - val2 - val3;
+
+                    collections.add(val1);
+                    collections.add(val2);
+                    collections.add(val3);
+                    collections.add(val4);
+
+                    Collections.shuffle(collections);
+
+                    result = "Результат голосования: \n" +
+                            "А: " + collections.get(0) + "\n" +
+                            "B: " + collections.get(1) + "\n" +
+                            "C: " + collections.get(2) + "\n" +
+                            "D: " + collections.get(3) + "\n";
+                }
+                sendMessage(new SendMessage(String.valueOf(chatId), result));
+
+                session.setHelp2Used(true);
+            }
+            case "/help3" -> {
+                //звонок другу
+            }
+            default -> throw new UnsupportedOperationException("Неизвестная команда - " + callbackData);
+        }
     }
 
     private void sendMenu(Long chatId) {
