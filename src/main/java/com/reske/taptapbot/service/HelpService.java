@@ -1,11 +1,12 @@
 package com.reske.taptapbot.service;
 
+import com.reske.taptapbot.common.TextConstants;
 import com.reske.taptapbot.entity.Question;
 import com.reske.taptapbot.model.Helper;
 import com.reske.taptapbot.model.Session;
 import org.springframework.stereotype.Component;
 
-import static com.reske.taptapbot.common.GameConstants.RANDOM;
+import static com.reske.taptapbot.util.UtilClass.RANDOM;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,7 +107,8 @@ public class HelpService {
                 possibleOptions.add(4);
             }
 
-            StringBuilder sb = new StringBuilder("Результат голосования: \n");
+            StringBuilder sb = new StringBuilder("Результат голосования:");
+            sb.append(TextConstants.LINE_BREAK);
             for (Integer possibleOption : possibleOptions) {
                 Integer temp = stack.pop();
                 switch (possibleOption) {
@@ -116,7 +118,7 @@ public class HelpService {
                     case 4 -> sb.append("D: ");
                 }
                 sb.append(temp);
-                sb.append("\n");
+                sb.append(TextConstants.LINE_BREAK);
             }
 
             result = sb.toString();
@@ -132,11 +134,11 @@ public class HelpService {
 
             Collections.shuffle(collections);
 
-            result = "Результат голосования: \n" +
-                     "А: " + collections.get(0) + "\n" +
-                     "B: " + collections.get(1) + "\n" +
-                     "C: " + collections.get(2) + "\n" +
-                     "D: " + collections.get(3) + "\n";
+            result = "Результат голосования:" + TextConstants.LINE_BREAK +
+                     "А: " + collections.get(0) + TextConstants.LINE_BREAK +
+                     "B: " + collections.get(1) + TextConstants.LINE_BREAK +
+                     "C: " + collections.get(2) + TextConstants.LINE_BREAK +
+                     "D: " + collections.get(3) + TextConstants.LINE_BREAK;
         }
 
         session.setHelp2Used(true);

@@ -1,9 +1,10 @@
 package com.reske.taptapbot.service;
 
-import com.reske.taptapbot.common.GameConstants;
+import com.reske.taptapbot.common.TextConstants;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.entity.Question;
 import com.reske.taptapbot.model.Session;
+import com.reske.taptapbot.util.UtilClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -59,7 +60,7 @@ public class SessionService {
 
     public void setCurrentQuestion(Session session) {
         List<Question> questions = session.getQuestions();
-        Question currentQuestion = questions.get(GameConstants.RANDOM.nextInt(questions.size()));
+        Question currentQuestion = questions.get(UtilClass.RANDOM.nextInt(questions.size()));
         session.setCurrentQuestion(currentQuestion);
         session.setLevel(session.getLevel() + 1);
         questions.remove(currentQuestion);
@@ -75,8 +76,8 @@ public class SessionService {
 
         profileService.addCorrectAnswers(session.getProfile(), correctAnswerCount);
 
-        return "Игра закончилась! \n" +
-               "Вы заработали " + profileService.addAndGetTotalScore(session) + " очков \n" +
+        return "Игра закончилась!" + TextConstants.LINE_BREAK +
+               "Вы заработали " + profileService.addAndGetTotalScore(session) + " очков" + TextConstants.LINE_BREAK +
                "Правильных ответов - " + correctAnswerCount;
 
     }

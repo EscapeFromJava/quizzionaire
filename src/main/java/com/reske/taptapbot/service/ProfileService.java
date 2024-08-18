@@ -1,6 +1,7 @@
 package com.reske.taptapbot.service;
 
 import com.reske.taptapbot.common.GameConstants;
+import com.reske.taptapbot.common.TextConstants;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.entity.Profile;
 import com.reske.taptapbot.model.Session;
@@ -23,9 +24,9 @@ public class ProfileService {
     }
 
     public String getStat(Profile profile) {
-        return "Пользователь: " + profile.getUserName() + "\n" +
-               "Очки: " + profile.getScore() + "\n" +
-               "Правильных ответов: " + profile.getCorrectAnswersCount() + "\n" +
+        return "Пользователь: " + profile.getUserName() + TextConstants.LINE_BREAK +
+               "Очки: " + profile.getScore() + TextConstants.LINE_BREAK +
+               "Правильных ответов: " + profile.getCorrectAnswersCount() + TextConstants.LINE_BREAK +
                "Пройдено вопросов: " + profile.getPassedQuestions();
     }
 

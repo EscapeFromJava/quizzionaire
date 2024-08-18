@@ -1,6 +1,8 @@
 package com.reske.taptapbot.service;
 
+import com.reske.taptapbot.common.EmojiConstants;
 import com.reske.taptapbot.common.GameConstants;
+import com.reske.taptapbot.common.TextConstants;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.model.Session;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,7 @@ public class MessageService {
 
     public SendMessage getStat(Long chatId, Session session) {
         String stat = profileService.getStat(session.getProfile());
-        return defaultMessage(chatId, "Ваша статистика: \n" + stat);
+        return defaultMessage(chatId, "Ваша статистика:" + TextConstants.LINE_BREAK + stat);
     }
 
     public SendMessage getGreeting(Long chatId, Session session) {
@@ -43,19 +45,25 @@ public class MessageService {
 
     public SendMessage getRightAnswerInfo(Long chatId, Session session) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Правильно \uD83D\uDD25\n");
+        sb.append("Правильно ");
+        sb.append(EmojiConstants.FIRE);
+        sb.append(TextConstants.LINE_BREAK);
         sb.append("Вы заработали ");
-        sb.append(gameConfig.getScoreTable().get(session.getLevel())).append(" очков\n");
+        sb.append(gameConfig.getScoreTable().get(session.getLevel()));
+        sb.append(" очков");
+        sb.append(TextConstants.LINE_BREAK);
         if (GameConstants.isFireproofLevel(session.getLevel())) {
-            sb.append("Достигнута несгораемая сумма!\n");
+            sb.append("Достигнута несгораемая сумма!");
+            sb.append(TextConstants.LINE_BREAK);
         }
-        sb.append("Следующий вопрос: \n");
+        sb.append("Следующий вопрос:");
+        sb.append(TextConstants.LINE_BREAK);
 
         return defaultMessage(chatId, sb.toString());
     }
 
     public SendMessage getLoseInfo(Long chatId, Session session) {
-        String loseInfo = "Неверный ответ \uD83D\uDC4E\n" +
+        String loseInfo = "Неверный ответ " + EmojiConstants.REVERSED_THUMBS_DOWN + TextConstants.LINE_BREAK +
                           "Правильный - " + session.getCurrentQuestion().getAnswer();
         return defaultMessage(chatId, loseInfo);
     }
