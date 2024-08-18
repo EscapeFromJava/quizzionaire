@@ -1,5 +1,6 @@
 package com.reske.taptapbot.service;
 
+import com.reske.taptapbot.common.EmojiConstants;
 import com.reske.taptapbot.common.GameConstants;
 import com.reske.taptapbot.common.TextConstants;
 import com.reske.taptapbot.config.GameConfig;
@@ -24,10 +25,10 @@ public class ProfileService {
     }
 
     public String getStat(Profile profile) {
-        return "Пользователь: " + profile.getUserName() + TextConstants.LINE_BREAK +
-               "Очки: " + profile.getScore() + TextConstants.LINE_BREAK +
-               "Правильных ответов: " + profile.getCorrectAnswersCount() + TextConstants.LINE_BREAK +
-               "Пройдено вопросов: " + profile.getPassedQuestions();
+        return "Пользователь " + EmojiConstants.PLAYER + ": " + profile.getUserName() + TextConstants.LINE_BREAK +
+               "Очки " + EmojiConstants.SCORE + ": " + profile.getScore() + TextConstants.LINE_BREAK +
+               "Правильных ответов " + EmojiConstants.THUMBS_UP + ": " + profile.getCorrectAnswersCount() + TextConstants.LINE_BREAK +
+               "Пройдено вопросов " + EmojiConstants.QUESTION + ": " + profile.getPassedQuestions();
     }
 
     public Integer addAndGetTotalScore(Session session) {

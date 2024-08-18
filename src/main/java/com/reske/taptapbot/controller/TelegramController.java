@@ -67,7 +67,7 @@ public class TelegramController extends TelegramLongPollingBot {
                 sendMessage(messageService.getAnswerMenu(chatId, session));
             }
             case "/stat" -> {
-                sendMessage(messageService.getStat(chatId, session));
+                sendMessage(messageService.defaultMessage(chatId, profileService.getStat(session.getProfile())));
                 sendMessage(messageService.getMainMenu(chatId));
             }
             case "/info" -> {

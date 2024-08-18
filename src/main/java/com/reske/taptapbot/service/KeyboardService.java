@@ -35,42 +35,57 @@ public class KeyboardService {
         Question currentQuestion = session.getCurrentQuestion();
         Map<String, Option> optionMenu = keyboardConfiguration.getOptionMenu();
 
-        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        List<InlineKeyboardButton> firstRowOptions = new ArrayList<>();
         if (currentQuestion.getOption1() != null) {
             InlineKeyboardButton button = generateOption(optionMenu.get("option1"), currentQuestion.getOption1());
-            row1.add(button);
+            firstRowOptions.add(button);
         }
         if (currentQuestion.getOption2() != null) {
             InlineKeyboardButton button = generateOption(optionMenu.get("option2"), currentQuestion.getOption2());
-            row1.add(button);
+            firstRowOptions.add(button);
         }
 
-        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        List<InlineKeyboardButton> secondRowOptions = new ArrayList<>();
         if (currentQuestion.getOption3() != null) {
             InlineKeyboardButton button = generateOption(optionMenu.get("option3"), currentQuestion.getOption3());
-            row2.add(button);
+            secondRowOptions.add(button);
         }
         if (currentQuestion.getOption4() != null) {
             InlineKeyboardButton button = generateOption(optionMenu.get("option4"), currentQuestion.getOption4());
-            row2.add(button);
+            secondRowOptions.add(button);
         }
 
+        List<InlineKeyboardButton> helpRow = getHelpMenu(session);
+
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        rows.add(firstRowOptions);
+        rows.add(secondRowOptions);
+        if (!helpRow.isEmpty()) {
+            rows.add(helpRow);
+        }
+
+        return new InlineKeyboardMarkup(rows);
+    }
+
+    private List<InlineKeyboardButton> getHelpMenu(Session session) {
         Map<String, Option> helpMenu = keyboardConfiguration.getHelpMenu();
-        List<InlineKeyboardButton> row3 = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+
         if (!session.isHelp1Used()) {
             InlineKeyboardButton button = generateOption(helpMenu.get("help1"), null);
-            row3.add(button);
+            row.add(button);
         }
         if (!session.isHelp2Used()) {
             InlineKeyboardButton button = generateOption(helpMenu.get("help2"), null);
-            row3.add(button);
+            row.add(button);
         }
         if (!session.isHelp3Used()) {
             InlineKeyboardButton button = generateOption(helpMenu.get("help3"), null);
-            row3.add(button);
+            row.add(button);
         }
 
-        return new InlineKeyboardMarkup(List.of(row1, row2, row3));
+        return row;
     }
 
     private InlineKeyboardButton generateOption(Option option, String optionValue) {

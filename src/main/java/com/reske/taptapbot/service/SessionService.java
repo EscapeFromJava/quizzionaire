@@ -1,5 +1,6 @@
 package com.reske.taptapbot.service;
 
+import com.reske.taptapbot.common.EmojiConstants;
 import com.reske.taptapbot.common.TextConstants;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.entity.Question;
@@ -67,18 +68,32 @@ public class SessionService {
     }
 
     public String calculateGameResult(Session session) {
+        StringBuilder sb = new StringBuilder("Игра закончилась! ");
+        sb.append(EmojiConstants.END);
+        sb.append(TextConstants.LINE_BREAK);
+
         int correctAnswerCount;
         if (session.getQuestions().isEmpty()) {
             correctAnswerCount = WIN_LEVEL;
+            sb.append("Ура! Вы выиграли 1000000!");
+            sb.append(TextConstants.LINE_BREAK);
+            sb.append("Поздравляем! ");
+            sb.append(EmojiConstants.WINNER_CUP);
         } else {
             correctAnswerCount = session.getLevel() - 1;
+            sb.append("Вы заработали ");
+            sb.append(profileService.addAndGetTotalScore(session));
+            sb.append(" очков ");
+            sb.append(EmojiConstants.DIAMOND);
+            sb.append(TextConstants.LINE_BREAK);
+            sb.append("Правильных ответов - ");
+            sb.append(correctAnswerCount);
+            sb.append(" ");
+            sb.append(EmojiConstants.SMILLING_FACE);
         }
 
         profileService.addCorrectAnswers(session.getProfile(), correctAnswerCount);
 
-        return "Игра закончилась!" + TextConstants.LINE_BREAK +
-               "Вы заработали " + profileService.addAndGetTotalScore(session) + " очков" + TextConstants.LINE_BREAK +
-               "Правильных ответов - " + correctAnswerCount;
-
+        return sb.toString();
     }
 }

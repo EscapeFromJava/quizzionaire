@@ -14,7 +14,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 @RequiredArgsConstructor
 public class MessageService {
 
-    private final ProfileService profileService;
     private final KeyboardService keyboardService;
     private final GameConfig gameConfig;
 
@@ -26,21 +25,16 @@ public class MessageService {
                 .build();
     }
 
-    public SendMessage getStat(Long chatId, Session session) {
-        String stat = profileService.getStat(session.getProfile());
-        return defaultMessage(chatId, "Ваша статистика:" + TextConstants.LINE_BREAK + stat);
-    }
-
-    public SendMessage getGreeting(Long chatId, Session session) {
-        return defaultMessage(chatId, "Привет, " + session.getProfile().getUserName() + "!");
-    }
-
     public SendMessage getAnswerMenu(Long chatId, Session session) {
         return SendMessage.builder()
                 .chatId(chatId)
                 .text(session.getCurrentQuestion().getQuestion())
                 .replyMarkup(keyboardService.answerMenu(session))
                 .build();
+    }
+
+    public SendMessage getGreeting(Long chatId, Session session) {
+        return defaultMessage(chatId, "Привет " + EmojiConstants.RAISED_HAND + ", " + session.getProfile().getUserName() + "!");
     }
 
     public SendMessage getRightAnswerInfo(Long chatId, Session session) {
@@ -50,13 +44,17 @@ public class MessageService {
         sb.append(TextConstants.LINE_BREAK);
         sb.append("Вы заработали ");
         sb.append(gameConfig.getScoreTable().get(session.getLevel()));
-        sb.append(" очков");
+        sb.append(" очков ");
+        sb.append(EmojiConstants.DIAMOND);
         sb.append(TextConstants.LINE_BREAK);
         if (GameConstants.isFireproofLevel(session.getLevel())) {
             sb.append("Достигнута несгораемая сумма!");
+            sb.append(EmojiConstants.FIRE);
             sb.append(TextConstants.LINE_BREAK);
         }
-        sb.append("Следующий вопрос:");
+        sb.append("Следующий вопрос ");
+        sb.append(EmojiConstants.QUESTION);
+        sb.append(":");
         sb.append(TextConstants.LINE_BREAK);
 
         return defaultMessage(chatId, sb.toString());
