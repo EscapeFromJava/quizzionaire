@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import static com.reske.taptapbot.util.UtilClass.RANDOM;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -153,18 +152,19 @@ public class HelpService {
         Question currentQuestion = session.getCurrentQuestion();
         if (level < 6) {
             helper = getHelperByHintLevel(GARANT_HELPERS);
-            result = generateHelperAnswer(helper, currentQuestion.getAnswer());
+            result = generateHelperAnswer(helper, List.of(currentQuestion.getAnswer()));
         } else if (level < 11) {
             helper = getHelperByHintLevel(POSSIBLE_HELPERS);
             result = generateHelperAnswer(
                     helper,
-                    currentQuestion.getOption1(),
-                    currentQuestion.getOption2(),
-                    currentQuestion.getOption3(),
-                    currentQuestion.getOption4());
+                    List.of(
+                            currentQuestion.getOption1(),
+                            currentQuestion.getOption2(),
+                            currentQuestion.getOption3(),
+                            currentQuestion.getOption4()));
         } else {
             helper = getHelperByHintLevel(NOT_HELPERS);
-            result = generateHelperAnswer(helper);
+            result = generateHelperAnswer(helper, List.of());
         }
 
         session.setHelp3Used(true);
@@ -180,17 +180,17 @@ public class HelpService {
                || currentQuestion.getOption4() == null;
     }
 
-    private String generateHelperAnswer(Helper helper, String... answers) {
-        if (answers.length == 1) {
-            return helper.getName() + ": " + helper.getPhrase() + answers[0];
-        } else if (answers.length == 4) {
-            List<String> processedAnswers = Arrays.stream(answers)
+    private String generateHelperAnswer(Helper helper, List<String> answers) {
+        if (answers.size() == 1) {
+            return helper.name() + ": " + helper.phrase() + answers.get(0);
+        } else if (answers.size() == 4) {
+            List<String> processedAnswers = answers.stream()
                     .filter(Objects::nonNull)
                     .toList();
             String answer = processedAnswers.get(RANDOM.nextInt(processedAnswers.size()));
-            return helper.getName() + ": " + helper.getPhrase() + answer;
+            return helper.name() + ": " + helper.phrase() + answer;
         } else {
-            return helper.getName() + ": " + helper.getPhrase();
+            return helper.name() + ": " + helper.phrase();
         }
     }
 
