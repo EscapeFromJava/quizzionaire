@@ -14,5 +14,5 @@ spring:
     change-log: classpath:/db/changelog-master.xml
 
 bot:
-  name: TapJustTapBot
+  name: QuizzionaireBot
   token: ${BOT_TOKEN:}
