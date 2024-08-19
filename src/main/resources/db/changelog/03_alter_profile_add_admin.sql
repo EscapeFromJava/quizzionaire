@@ -1,0 +1,2 @@
+ALTER TABLE profile
+    ADD is_admin BOOLEAN DEFAULT FALSE;

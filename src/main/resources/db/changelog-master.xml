@@ -7,5 +7,6 @@
 
     <include file="/db/changelog/01_init.sql"/>
     <include file="/db/changelog/02_insert_100_questions.sql"/>
+    <include file="/db/changelog/03_alter_profile_add_admin.sql"/>
 
 </databaseChangeLog>

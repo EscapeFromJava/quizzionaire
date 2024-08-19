@@ -4,6 +4,7 @@ keyboard:
     "[Статистика 📊]": /stat
     "[Таблица лидеров 🥇]": /leaders
     "[Информация ⁉️]": /info
+    "[Админ панель 👮‍♂️️]": /admin
   option-menu:
     option1:
       text: "A. "

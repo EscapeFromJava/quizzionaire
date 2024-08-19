@@ -26,6 +26,8 @@ public class Profile {
     private Integer correctAnswersCount = 0;
     @Column(name = "passed_questions")
     private Integer passedQuestions = 0;
+    @Column(name = "is_admin")
+    private boolean isAdmin;
 
     public Profile(Long id, String userName) {
         this.id = id;

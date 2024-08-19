@@ -17,4 +17,10 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
             """, nativeQuery = true)
     List<Profile> findLeaders(@Param("limit") int limit);
 
+    @Query(value = """
+            SELECT COUNT(*)
+            FROM profile
+            """, nativeQuery = true)
+    long personCounter();
+
 }

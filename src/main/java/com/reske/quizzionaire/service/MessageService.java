@@ -4,6 +4,7 @@ import com.reske.quizzionaire.common.EmojiConstants;
 import com.reske.quizzionaire.common.GameConstants;
 import com.reske.quizzionaire.config.GameConfig;
 import com.reske.quizzionaire.model.Session;
+import com.reske.quizzionaire.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -15,6 +16,7 @@ public class MessageService {
 
     private final KeyboardService keyboardService;
     private final GameConfig gameConfig;
+    private final ProfileRepository profileRepository;
 
     public SendMessage getMainMenu(Long chatId) {
         return SendMessage.builder()
@@ -62,6 +64,16 @@ public class MessageService {
         String loseInfo = "Неверный ответ " + EmojiConstants.REVERSED_THUMBS_DOWN + "\n" +
                           "Правильный - " + session.getCurrentQuestion().getAnswer();
         return defaultMessage(chatId, loseInfo);
+    }
+
+    public SendMessage getAdminInfo(Long chatId, Session session) {
+        String adminInfo;
+        if (session.getProfile().isAdmin()) {
+            adminInfo = "Количество игроков: " + profileRepository.personCounter();
+        } else {
+            adminInfo = "У вас отсутствуют права администратора!";
+        }
+        return defaultMessage(chatId, adminInfo);
     }
 
     public SendMessage defaultMessage(Long chatId, String message) {

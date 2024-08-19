@@ -60,6 +60,10 @@ public class TelegramController extends TelegramLongPollingBot {
         Session session = sessionService.get(chatId);
 
         switch (callbackData) {
+            case "/admin" -> {
+                sendMessage(messageService.getAdminInfo(chatId, session));
+                sendMessage(messageService.getMainMenu(chatId));
+            }
             case "/play" -> {
                 sessionService.fillQuestions(session);
                 sessionService.setCurrentQuestion(session);
