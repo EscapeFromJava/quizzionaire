@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
@@ -71,7 +70,7 @@ public class TelegramController extends TelegramLongPollingBot {
                 sendMessage(messageService.getMainMenu(chatId));
             }
             case "/info" -> {
-                sendMessage(new SendMessage(String.valueOf(chatId), gameConfig.getInfo()));
+                sendMessage(messageService.defaultMessage(chatId, gameConfig.getInfo()));
                 sendMessage(messageService.getMainMenu(chatId));
             }
             case "/option1",
