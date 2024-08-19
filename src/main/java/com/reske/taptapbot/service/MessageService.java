@@ -2,7 +2,6 @@ package com.reske.taptapbot.service;
 
 import com.reske.taptapbot.common.EmojiConstants;
 import com.reske.taptapbot.common.GameConstants;
-import com.reske.taptapbot.common.TextConstants;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.model.Session;
 import lombok.RequiredArgsConstructor;
@@ -41,27 +40,26 @@ public class MessageService {
         StringBuilder sb = new StringBuilder();
         sb.append("Правильно ");
         sb.append(EmojiConstants.FIRE);
-        sb.append(TextConstants.LINE_BREAK);
+        sb.append("\n");
         sb.append("Вы заработали ");
         sb.append(gameConfig.getScoreTable().get(session.getLevel()));
         sb.append(" очков ");
         sb.append(EmojiConstants.DIAMOND);
-        sb.append(TextConstants.LINE_BREAK);
+        sb.append("\n");
         if (GameConstants.isFireproofLevel(session.getLevel())) {
             sb.append("Достигнута несгораемая сумма!");
             sb.append(EmojiConstants.FIRE);
-            sb.append(TextConstants.LINE_BREAK);
+            sb.append("\n");
         }
         sb.append("Следующий вопрос ");
         sb.append(EmojiConstants.QUESTION);
-        sb.append(":");
-        sb.append(TextConstants.LINE_BREAK);
+        sb.append(":\n");
 
         return defaultMessage(chatId, sb.toString());
     }
 
     public SendMessage getLoseInfo(Long chatId, Session session) {
-        String loseInfo = "Неверный ответ " + EmojiConstants.REVERSED_THUMBS_DOWN + TextConstants.LINE_BREAK +
+        String loseInfo = "Неверный ответ " + EmojiConstants.REVERSED_THUMBS_DOWN + "\n" +
                           "Правильный - " + session.getCurrentQuestion().getAnswer();
         return defaultMessage(chatId, loseInfo);
     }

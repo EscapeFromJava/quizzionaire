@@ -2,7 +2,6 @@ package com.reske.taptapbot.service;
 
 import com.reske.taptapbot.common.EmojiConstants;
 import com.reske.taptapbot.common.GameConstants;
-import com.reske.taptapbot.common.TextConstants;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.entity.Profile;
 import com.reske.taptapbot.model.Session;
@@ -16,8 +15,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ProfileService {
 
+    private static final int MAX_TOP_PROFILES = 5;
+
     private final ProfileRepository repository;
     private final GameConfig gameConfig;
+    private final ProfileRepository profileRepository;
 
     public Profile getOrCreate(Long id, String userName) {
         return repository.findById(id)
@@ -25,9 +27,9 @@ public class ProfileService {
     }
 
     public String getStat(Profile profile) {
-        return "Пользователь " + EmojiConstants.PLAYER + ": " + profile.getUserName() + TextConstants.LINE_BREAK +
-               "Очки " + EmojiConstants.SCORE + ": " + profile.getScore() + TextConstants.LINE_BREAK +
-               "Правильных ответов " + EmojiConstants.THUMBS_UP + ": " + profile.getCorrectAnswersCount() + TextConstants.LINE_BREAK +
+        return "Пользователь " + EmojiConstants.PLAYER + ": " + profile.getUserName() + "\n" +
+               "Очки " + EmojiConstants.SCORE + ": " + profile.getScore() + "\n" +
+               "Правильных ответов " + EmojiConstants.THUMBS_UP + ": " + profile.getCorrectAnswersCount() + "\n" +
                "Пройдено вопросов " + EmojiConstants.QUESTION + ": " + profile.getPassedQuestions();
     }
 
@@ -58,4 +60,22 @@ public class ProfileService {
         profile.setCorrectAnswersCount(profile.getCorrectAnswersCount() + correctAnswerCount);
         repository.save(profile);
     }
+
+    public String getLeadersInfo() {
+        StringBuilder sb = new StringBuilder();
+        int position = 1;
+        for (Profile leader : profileRepository.findLeaders(MAX_TOP_PROFILES)) {
+            sb.append("[");
+            sb.append(position++);
+            sb.append("] ");
+            sb.append(leader.getUserName());
+            sb.append(": ");
+            sb.append(leader.getScore());
+            sb.append(" ");
+            sb.append(EmojiConstants.DIAMOND);
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 }

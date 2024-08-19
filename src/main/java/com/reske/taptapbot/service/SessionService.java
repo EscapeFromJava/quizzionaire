@@ -1,7 +1,6 @@
 package com.reske.taptapbot.service;
 
 import com.reske.taptapbot.common.EmojiConstants;
-import com.reske.taptapbot.common.TextConstants;
 import com.reske.taptapbot.config.GameConfig;
 import com.reske.taptapbot.entity.Question;
 import com.reske.taptapbot.model.Session;
@@ -70,13 +69,12 @@ public class SessionService {
     public String calculateGameResult(Session session) {
         StringBuilder sb = new StringBuilder("Игра закончилась! ");
         sb.append(EmojiConstants.END);
-        sb.append(TextConstants.LINE_BREAK);
+        sb.append("\n");
 
         int correctAnswerCount;
         if (session.getQuestions().isEmpty()) {
             correctAnswerCount = WIN_LEVEL;
-            sb.append("Ура! Вы выиграли 1000000!");
-            sb.append(TextConstants.LINE_BREAK);
+            sb.append("Ура! Вы выиграли 1000000!\n");
             sb.append("Поздравляем! ");
             sb.append(EmojiConstants.WINNER_CUP);
         } else {
@@ -85,7 +83,7 @@ public class SessionService {
             sb.append(profileService.addAndGetTotalScore(session));
             sb.append(" очков ");
             sb.append(EmojiConstants.DIAMOND);
-            sb.append(TextConstants.LINE_BREAK);
+            sb.append("\n");
             sb.append("Правильных ответов - ");
             sb.append(correctAnswerCount);
             sb.append(" ");

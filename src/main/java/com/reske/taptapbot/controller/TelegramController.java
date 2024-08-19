@@ -73,6 +73,10 @@ public class TelegramController extends TelegramLongPollingBot {
                 sendMessage(messageService.defaultMessage(chatId, gameConfig.getInfo()));
                 sendMessage(messageService.getMainMenu(chatId));
             }
+            case "/leaders" -> {
+                sendMessage(messageService.defaultMessage(chatId, profileService.getLeadersInfo()));
+                sendMessage(messageService.getMainMenu(chatId));
+            }
             case "/option1",
                  "/option2",
                  "/option3",

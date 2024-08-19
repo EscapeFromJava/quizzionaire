@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -21,14 +22,17 @@ public class KeyboardService {
     private final KeyboardConfiguration keyboardConfiguration;
 
     public InlineKeyboardMarkup mainMenu() {
-        return new InlineKeyboardMarkup(
-                List.of(
-                        keyboardConfiguration.getMainMenu().entrySet().stream()
-                                .map(entry -> InlineKeyboardButton.builder()
-                                        .text(entry.getKey())
-                                        .callbackData(entry.getValue())
-                                        .build()
-                                ).toList()));
+        List<InlineKeyboardButton> buttons = keyboardConfiguration.getMainMenu().entrySet().stream()
+                .map(entry -> InlineKeyboardButton.builder()
+                        .text(entry.getKey())
+                        .callbackData(entry.getValue())
+                        .build()
+                ).toList();
+        List<List<InlineKeyboardButton>> rows = buttons.stream()
+                .collect(Collectors.groupingBy(button -> buttons.indexOf(button) / 2))
+                .values().stream()
+                .toList();
+        return new InlineKeyboardMarkup(rows);
     }
 
     public InlineKeyboardMarkup answerMenu(Session session) {
