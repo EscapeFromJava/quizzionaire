@@ -4,7 +4,7 @@ spring:
       game,
       keyboard
   datasource:
-    url: jdbc:postgresql://localhost:5432/root
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/root
     username: root
     password: root
   jpa:
@@ -12,6 +12,9 @@ spring:
       ddl-auto: update
   liquibase:
     change-log: classpath:/db/changelog-master.xml
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/root
+    user: root
+    password: root
 
 bot:
   name: QuizzionaireBot
