@@ -83,7 +83,7 @@
                 <version>4.29.1</version>
                 <configuration>
                     <changeLogFile>src/main/resources/db/changelog-master.xml</changeLogFile>
-                    <url>jdbc:postgresql://localhost:5432/root</url>
+                    <url>jdbc:postgresql://localhost:5432/root?currentSchema=quizzionaire_bot</url>
                     <username>root</username>
                     <password>root</password>
                 </configuration>

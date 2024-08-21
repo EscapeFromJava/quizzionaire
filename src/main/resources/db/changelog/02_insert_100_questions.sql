@@ -1,4 +1,4 @@
-INSERT INTO question(question, answer, option1, option2, option3, option4)
+INSERT INTO quizzionaire_bot.question(question, answer, option1, option2, option3, option4)
 VALUES ('Как называется еврейский Новый год?', 'Рош ха-Шана',
         'Ханука', 'Йом Кипур', 'Кванза', 'Рош ха-Шана'),
        ('Сколько синих полос на флаге США?', '0',
